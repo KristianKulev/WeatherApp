@@ -1,6 +1,6 @@
 import React from "react";
 
-function Search({ onInput, inputVal, onError, onSearch }) {
+function Search({ onInput, inputVal, onError, onSearch, isLoading }) {
   const handleSearch = () => {
     if (inputVal.trim() === "") {
       onError("Please enter a valid city.");
@@ -19,6 +19,7 @@ function Search({ onInput, inputVal, onError, onSearch }) {
         className="flex-auto px-4 py-2 border border-gray-300 rounded-l focus:outline-none min-w-0"
       />
       <button
+        disabled={isLoading}
         onClick={handleSearch}
         className="bg-blue-500 text-white px-4 py-2 rounded-r hover:bg-blue-600 transition"
       >

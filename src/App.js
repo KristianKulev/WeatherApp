@@ -7,31 +7,36 @@ function App() {
   const [weatherData, setWeatherData] = useState(null);
   const [forecastData, setForecastData] = useState(null);
   const [city, setCity] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [unit, setUnit] = useState("metric"); // Default to Celsius
 
   const fetchWeatherData = async (location, unit) => {
-    setLoading(true);
+    setIsLoading(true);
     setError("");
+
     try {
-      const weatherResponse = await fetchWeather(location, unit);
 
-      setWeatherData(weatherResponse.data);
+      const weatherResults = await Promise.all([
+        fetchWeather(location, unit),
+        fetchForecast(location, unit)
+      ]);
 
-      const forecastResponse = await fetchForecast(location, unit);
-      setForecastData(forecastResponse.data.list.slice(0, 5));
+      setWeatherData(weatherResults[0].data);
+      setForecastData(weatherResults[1].data.list.slice(0, 5));
+
     } catch (error) {
       setError("Could not fetch weather data. Please try again.");
     }
-    setLoading(false);
+    setIsLoading(false);
   };
 
-  const toggleUnits = () => {
+  const toggleUnits = async () => {
     const newUnit = unit === "metric" ? "imperial" : "metric";
-    setUnit(newUnit);
 
-    fetchWeatherData(city, newUnit);
+    await fetchWeatherData(city, newUnit);
+
+    setUnit(newUnit);
   };
 
   return (
@@ -45,16 +50,22 @@ function App() {
           onError={setError}
           onInput={setCity}
           inputVal={city}
+          isLoading={isLoading}
         />
         {/* Error Message */}
         {error && <p className="text-red-500 text-center">{error}</p>}
         {/* Loading State */}
-        {loading && <p className="text-center">Loading...</p>}
+        {isLoading && <p className="text-center">Loading...</p>}
       </header>{" "}
       {weatherData && (
         <section className="flex flex-auto flex-col p-6 min-h-0 bg-white rounded shadow w-5/6 lg:w-1/2">
           {/* Weather Display */}
-          <Weather data={weatherData} unit={unit} toggleUnits={toggleUnits} />
+          <Weather
+            data={weatherData}
+            unit={unit}
+            toggleUnits={toggleUnits}
+            isLoading={isLoading}
+          />
 
           {/* Forecast Display */}
           {forecastData && <Forecast data={forecastData} unit={unit} />}

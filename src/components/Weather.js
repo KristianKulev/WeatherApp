@@ -1,6 +1,6 @@
 import React from "react";
 
-function Weather({ data, toggleUnits, unit }) {
+function Weather({ data, toggleUnits, unit, isLoading }) {
   return (
     <div className="text-center mb-4">
       <header className="flex justify-between">
@@ -8,6 +8,7 @@ function Weather({ data, toggleUnits, unit }) {
         {/* Unit Toggle */}
         <div className="text-center">
           <button
+            disabled={isLoading}
             onClick={toggleUnits}
             className="px-2 py-2 text-sm text-blue-500 border border-blue-500 rounded-lg hover:bg-blue-500 hover:text-white transition"
           >
